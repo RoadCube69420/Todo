@@ -8,10 +8,7 @@ const todoSubmit = document.querySelector('.submit-btn');
 let todoType = '';
 let dataValue = 0;
 const todoList = document.querySelector('div#todo-list');
-console.log(todoTextField);
-todoTextField.addEventListener('change', (e) => {
-    e.preventDefault()
-})
+const todoListOriginal = todoList.outerHTML;
 const createTodoItem = (Name, Type) => {
     // const element = document.createElement('div');
     // element.innerHTML = `
@@ -39,9 +36,47 @@ const createTodoItem = (Name, Type) => {
     ` ;
     // element.setAttribute('class', 'todo-item ')
     todoList.insertAdjacentHTML('afterbegin', html);
+    localStorage.setItem('todoList', todoList.innerHTML);
     dataValue++;
     // console.log(element)
 }
+const selfRemove = (datavalue) => {
+    document.querySelector(`[data-value="${datavalue}"]`).remove();
+    localStorage.setItem('todoList', todoList.innerHTML);
+};
+const edit = (datavalue) => {
+    const text = document.querySelector(`h2[data-value="${datavalue}"]`);
+    const newElement = document.createElement('input');
+    const editBtn = document.querySelector(`.edit`);
+    const doneBtn = document.querySelector(`.done`);
+    newElement.setAttribute('data-value', text.getAttribute('data-value'));
+    newElement.value = text.innerText;
+    text.parentNode.replaceChild(newElement, text);
+    editBtn.classList.add('hidden');
+    editBtn.classList.remove('visible');
+    doneBtn.classList.add('visible');
+    doneBtn.classList.remove('hidden');
+    localStorage.setItem('todoList', todoList.innerHTML);
+}
+const done = (datavalue) => {
+    const text = document.querySelector(`input[data-value="${datavalue}"]`);
+    const newElement = document.createElement('h2');
+    const editBtn = document.querySelector(`.edit`);
+    const doneBtn = document.querySelector(`.done`);
+    newElement.setAttribute('data-value', text.getAttribute('data-value'));
+    newElement.innerText = text.value;
+    text.parentNode.replaceChild(newElement, text);
+    doneBtn.classList.add('hidden');
+    doneBtn.classList.remove('visible');
+    editBtn.classList.add('visible');
+    editBtn.classList.remove('hidden');
+    localStorage.setItem('todoList', todoList.innerHTML);
+}
+console.log(todoTextField);
+todoTextField.addEventListener('change', (e) => {
+    e.preventDefault()
+})
+
 form.addEventListener('submit', (e) => {
     e.preventDefault()
 });
@@ -62,35 +97,12 @@ personalBtn.addEventListener('click', (e) => {
     todoType = 'personal';
     console.log(todoType)
 })
-const selfRemove = (datavalue) => {
-    document.querySelector(`[data-value="${datavalue}"]`).remove();
-};
-const edit = (datavalue) => {
-    const text = document.querySelector(`h2[data-value="${datavalue}"]`);
-    const newElement = document.createElement('input');
-    const editBtn = document.querySelector(`.edit`);
-    const doneBtn = document.querySelector(`.done`);
-    newElement.setAttribute('data-value', text.getAttribute('data-value'));
-    newElement.value = text.innerText;
-    text.parentNode.replaceChild(newElement, text);
-    editBtn.classList.add('hidden');
-    editBtn.classList.remove('visible');
-    doneBtn.classList.add('visible');
-    doneBtn.classList.remove('hidden');
-}
-const done = (datavalue) => {
-    const text = document.querySelector(`input[data-value="${datavalue}"]`);
-    const newElement = document.createElement('h2');
-    const editBtn = document.querySelector(`.edit`);
-    const doneBtn = document.querySelector(`.done`);
-    newElement.setAttribute('data-value', text.getAttribute('data-value'));
-    newElement.innerText = text.value;
-    text.parentNode.replaceChild(newElement, text);
-    doneBtn.classList.add('hidden');
-    doneBtn.classList.remove('visible');
-    editBtn.classList.add('visible');
-    editBtn.classList.remove('hidden');
-}
-document.querySelector('.done').addEventListener('change', function(e) {
-    done(e.target.getAttribute('data-value'))
+window.addEventListener('load', (e) => {
+    userName.value = localStorage.getItem('name') || '';
+    todoList.innerHTML = localStorage.getItem('todoList') || todoListOriginal;
+
+})
+userName.addEventListener('change', (e) => {
+    e.preventDefault()
+    localStorage.setItem('name', userName.value);
 })
